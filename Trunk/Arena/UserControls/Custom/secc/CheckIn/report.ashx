@@ -13,7 +13,8 @@ public class report : IHttpHandler {
         context.Response.Buffer = true;
         context.Response.Clear();
         context.Response.ContentType = "application/pdf";
-        context.Response.AddHeader("content-disposition", "file.pdf");
+        context.Response.AddHeader("content-disposition", "inline;filename=file.pdf");
+        
 
         string url = context.Request.RawUrl;
         string[] ids = url.Substring(url.IndexOf('?') + 1).Split(',', '#');
