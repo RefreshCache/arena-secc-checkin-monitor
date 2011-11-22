@@ -185,6 +185,8 @@ public partial class CheckInMonitor : PortalControl
         }
     }
 
+    public string LabelPath { get; set; }
+
     #endregion
 
     #region Private Properties...
@@ -224,6 +226,8 @@ public partial class CheckInMonitor : PortalControl
             this.pnlRooms.Visible = this.ShowRoomsSetting;
 
             this.pnlPanic.Visible = string.IsNullOrEmpty(this.PanicTagSetting) ? false : this.ShowPanicSetting;
+
+            LabelPath = String.Empty;
         }
 
         LabelRefresh.Text = DateTime.Now.ToString();
@@ -562,6 +566,7 @@ public partial class CheckInMonitor : PortalControl
         this.CreateTagDropdown(int.Parse(dropChild.SelectedValue));
     }
 
+
     protected void dropRoomStatus_SelectedIndexChanged(object sender, EventArgs e)
     {
         int id = int.Parse(hfOccurrence.Value);
@@ -593,6 +598,11 @@ public partial class CheckInMonitor : PortalControl
         this.ChangePopupView(4);
 
     
+    }
+
+    protected void tagsSelect_SelectedIndexChanged (object sender, EventArgs e)
+    {
+        SetLabelPath();
     }
 
     #region Command Buttons...
@@ -931,7 +941,7 @@ public partial class CheckInMonitor : PortalControl
         /// hidden unless told otherwise....
         viewPopupOptions.ActiveViewIndex = 0;
         viewRoomCap.ActiveViewIndex = 0;
-
+        PopupButton1.Visible = true;
         switch (viewIndex) {
             /// View room participants
             case 0:
@@ -998,9 +1008,7 @@ public partial class CheckInMonitor : PortalControl
             case 3:
                 mv.ActiveViewIndex = 3;
                 viewPopupOptions.ActiveViewIndex = 2;
-
-                PopupButton1.Text = "Print";
-                PopupButton1.OnClientClick = "document.getElementById('objectTag').print(); return false;";
+                PopupButton1.Visible = false;
                 //PopupButton1.OnClientClick = "document.getElementById('objectTag').printWithDialog(); return false;";
                 break;
             //Move all in room
@@ -1046,6 +1054,16 @@ public partial class CheckInMonitor : PortalControl
         tagsSelect.DataValueField = "Value";
         tagsSelect.DataSource = items.OrderBy(s => s.Text);
         tagsSelect.DataBind();
+
+        if (tagsSelect.Items.Count > 0)
+        {
+            pnlTag.Visible = true;
+            SetLabelPath();
+        }
+        else
+        {
+            pnlTag.Visible = false;
+        }
     }
 
     private void ShowOccurrences()
@@ -1133,6 +1151,11 @@ public partial class CheckInMonitor : PortalControl
             TotalAttendees.Text = CD.Occurrences.Where(x => this.VisibleAttendanceTypeCategories.Contains(x.AttendanceTypeCategoryId)).Sum(c => c.CurrentAttendees).ToString();
             TotalVolunteers.Text = CD.Occurrences.Where(x => this.VisibleAttendanceTypeCategories.Contains(x.AttendanceTypeCategoryId)).Sum(c => c.CurrentVolunteers).ToString();
         }
+    }
+
+    private void SetLabelPath()
+    {
+        LabelPath = string.Format("UserControls/Custom/SECC/Checkin/report.ashx?{0},{1},{2}#toolbar=1&navpanes=0&scrollbar=0&view=Fit", tagsSelect.SelectedValue,  dropChild.SelectedValue, base.CurrentOrganization.OrganizationID);
     }
 
     private void SplitSearchQuery(out string name1, out string name2, out string securityCode)

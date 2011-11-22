@@ -262,9 +262,7 @@
             } 
         }
         
-        if(isTagsOpen) {
-            swapTag();
-        }
+
         
         if (isSearchOpen) {
             try {
@@ -314,28 +312,6 @@
         timer._doPostback();
     }
     
-    function swapTag() {
-        var objCont = document.getElementById("objContainer");  
-        var obj = document.getElementById("objectTag").cloneNode();
-        var dropOccId = document.getElementById("<%= dropChild.ClientID %>");
-        var dropTag = document.getElementById("<%= tagsSelect.ClientID %>");
-        
-        if(dropTag.options.length > 0) {
-        obj.data = "UserControls/Custom/SECC/Checkin/report.ashx?" + dropTag.options[dropTag.selectedIndex].value;
-        obj.data += "," + dropOccId.options[dropOccId.selectedIndex].value;
-        obj.data += ",<%= this.CurrentOrganization.OrganizationID.ToString() %>" + "#toolbar=0&navpanes=0&scrollbar=0&zoom=100";
-
-        if(obj.firstChild == null) { 
-            var objParam = document.createElement("param");
-            objParam.name = "src";
-            objParam.value = obj.data;
-            
-            obj.appendChild(objParam);
-        }
-        
-        objCont.replaceChild(obj, objCont.lastChild);
-        // "../../UserControls/Custom/SECC/Checkin/report.ashx?/Arena/Checkin/TestParentChildReceipt,1445928#toolbar=0&navpanes=0&scrollbar=0";
-    }}
 
     function ConfirmBulkMove()
     {
@@ -680,10 +656,11 @@
                             <secc:MovePerson ID="ucMovePerson" runat="server" />
                         </asp:View>
                         <asp:View ID="viewTags" runat="server">
-                            <div id="objContainer">
-                                <object id="objectTag" type="application/pdf" width="100%" height="100%">
-                                </object>
-                            </div>
+                            <asp:Panel ID="pnlTag" runat="server" Visible="false">
+                            <object id="objectTag" data="<%=LabelPath%>" type="application/pdf" width="600" height="400">
+                              <embed type="application/pdf" src="<%=LabelPath %>" width="600" height="400" />
+                            </object>
+                            </asp:Panel>
                         </asp:View>
                     </asp:MultiView>
                 </div>
@@ -756,7 +733,7 @@
                                             OnSelectedIndexChanged="dropChild_SelectedIndexChanged" AutoPostBack="true">
                                         </asp:DropDownList>
                                         Tag:
-                                        <asp:DropDownList ID="tagsSelect" runat="server" onchange="swapTag();" EnableViewState="false">
+                                        <asp:DropDownList ID="tagsSelect" runat="server" OnSelectedIndexChanged="tagsSelect_SelectedIndexChanged" AutoPostBack="true" EnableViewState="true">
                                         </asp:DropDownList>
                                     </div>
                                 </asp:View>
